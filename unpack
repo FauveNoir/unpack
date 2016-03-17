@@ -1,0 +1,136 @@
+#!/bin/zsh
+
+if [ -f $1 ] ; then
+	MIMETYPEOFFILE=`file --mime-type --brief $1`
+
+	case $MIMETYPEOFFILE in
+
+		application/x-bzip[2|])
+			TYPEOFCONTENT=$(file --mime-type --brief --uncompress $1)
+			case $TYPEOFCONTENT in
+				application/x-tar)
+					CONTENTARCHIVELIST=$(tar --list --file $1)
+					NUMBEROFFILES=$(echo $CONTENTARCHIVELIST | wc --lines)
+					if [ $NUMBEROFFILES -eq 1 ]; then
+						tar --extract --bzip2 --file $1
+					else
+						mkdir ${1%.tar.bz}
+						tar --extract --bzip2 --file $1 --directory ${1%.tar.bz}
+					fi
+					;;
+				*)
+					bunzip2 $1
+					;;
+			esac
+			;;
+
+
+		application/x-gzip)
+			TYPEOFCONTENT=$(file --mime-type --brief --uncompress $1)
+			case $TYPEOFCONTENT in
+				application/x-tar)
+					CONTENTARCHIVELIST=$(tar --list --file $1)
+					NUMBEROFFILES=$(echo $CONTENTARCHIVELIST | wc --lines)
+					if [ $NUMBEROFFILES -eq 1 ]; then
+						tar --extract --gzip --file $1
+					else
+						mkdir ${1%.tar.gz}
+						tar --extract --gzip --file $1 --directory ${1%.tar.bz}
+					fi
+					;;
+				*)
+					gunzip $1
+					;;
+			esac
+			;;
+
+
+		application/x-xz)
+			TYPEOFCONTENT=$(file --mime-type --brief --uncompress $1)
+			case $TYPEOFCONTENT in
+				application/x-tar)
+					CONTENTARCHIVELIST=$(tar --list --file $1)
+					NUMBEROFFILES=$(echo $CONTENTARCHIVELIST | wc --lines)
+					if [ $NUMBEROFFILES -eq 1 ]; then
+						tar --extract --xz --file $1
+					else
+						mkdir ${1%.tar.xz}
+						tar --extract --xz --file $1 --directory ${1%.tar.bz}
+					fi
+					;;
+				*)
+					unxz $1
+					;;
+			esac
+			;;
+
+
+		application/x-rar-compressed)
+			CONTENTARCHIVELIST=$(unrar lb $1)
+			NUMBEROFFILES=$(echo $CONTENTARCHIVELIST | wc --lines)
+			if [ $NUMBEROFFILES -eq 1 ]; then
+				unrar $1
+			else
+				mkdir ${1%.rar}
+				unrar e $1 ${1%.tar.bz}
+			fi
+			;;
+
+
+		application/x-tar)
+			CONTENTARCHIVELIST=$(tar --list --file $1)
+			NUMBEROFFILES=$(echo $CONTENTARCHIVELIST | wc --lines)
+			if [ $NUMBEROFFILES -eq 1 ]; then
+				tar --extract --file $1
+			else
+				mkdir ${1%.tar}
+				tar --extract --file $1 --directory ${1%.tar}
+			fi
+			;;
+
+
+		application/x-compress)
+			TYPEOFCONTENT=$(file --mime-type --brief --uncompress $1)
+			case $TYPEOFCONTENT in
+				application/x-tar)
+					CONTENTARCHIVELIST=$(tar --list --file $1)
+					NUMBEROFFILES=$(echo $CONTENTARCHIVELIST | wc --lines)
+					if [ $NUMBEROFFILES -eq 1 ]; then
+						tar --extract --compress --file $1
+					else
+						mkdir ${1%.tar.Z}
+						tar --extract --compress --file $1 --directory ${1%.tar.Z}
+					fi
+					;;
+				*)
+					uncompress $1
+					;;
+			esac
+			;;
+
+
+		application/x-7z-compressed)
+			NUMBEROFFILES=$(7z l -slt $1 | grep --count 'Path = [^/]*$')
+			if [ $NUMBEROFFILES -eq 1 ]; then
+				7z x  $1
+			else
+				mkdir ${1%.7z}
+				7z x  $1 -o${1%.7z}
+			fi
+			;;
+
+
+		application/zip)
+			NUMBEROFFILES=$(unzip -l $1 | sed -e '$!d' | sed -e "s/ *[0-9]* *\([0-9]*\) file.*/\1/")
+			if [ $NUMBEROFFILES -eq 1 ]; then
+				unzip $1
+			else
+				mkdir ${1%.zip}
+				unzip $1 -d ${1%.zip}
+			fi
+			;;
+	esac
+
+else
+	echo "“$1” is not a valid file"
+fi
