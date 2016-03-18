@@ -35,7 +35,7 @@ if [ -f $1 ] ; then
 						tar --extract --gzip --file $1
 					else
 						mkdir ${1%.tar.gz}
-						tar --extract --gzip --file $1 --directory ${1%.tar.bz}
+						tar --extract --gzip --file $1 --directory ${1%.tar.gz}
 					fi
 					;;
 				*)
@@ -55,7 +55,7 @@ if [ -f $1 ] ; then
 						tar --extract --xz --file $1
 					else
 						mkdir ${1%.tar.xz}
-						tar --extract --xz --file $1 --directory ${1%.tar.bz}
+						tar --extract --xz --file $1 --directory ${1%.tar.xz}
 					fi
 					;;
 				*)
@@ -72,7 +72,7 @@ if [ -f $1 ] ; then
 				unrar $1
 			else
 				mkdir ${1%.rar}
-				unrar e $1 ${1%.tar.bz}
+				unrar e $1 ${1%.rar}
 			fi
 			;;
 
