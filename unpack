@@ -14,8 +14,8 @@ if [ -f $1 ] ; then
 					if [ $NUMBEROFFILES -eq 1 ]; then
 						tar --extract --bzip2 --file $1
 					else
-						mkdir ${1%.tar.bz}
-						tar --extract --bzip2 --file $1 --directory ${1%.tar.bz}
+						mkdir ${1%.tar.bz[2|]}
+						tar --extract --bzip2 --file $1 --directory ${1%.tar.bz[2|]}
 					fi
 					;;
 				*)
